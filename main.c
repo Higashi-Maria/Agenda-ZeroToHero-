@@ -1,11 +1,4 @@
-/******************************************************************************
-
-Welcome to GDB Online.
-  GDB online is an online compiler and debugger tool for C, C++, Python, PHP, Ruby, 
-  C#, OCaml, VB, Perl, Swift, Prolog, Javascript, Pascal, COBOL, HTML, CSS, JS
-  Code, Compile, Run and Debug online from anywhere in world.
-
-*******************************************************************************/
+//Agenda-ZeroToHero - Maria Luiza Higashi
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,6 +39,7 @@ void main(void) {
         printf("[0]. Sair\n");
 
         scanf("%d", &registro);
+        getchar(); // Limpa o buffer do teclado após o scanf
 
         switch(registro) {
             case 1:
@@ -88,10 +82,14 @@ void novo_contato(contato contatos[], int *numContatos) {
         return;
     }
 
+    // Leitura do nome, incluindo espaços
     printf("Digite o nome\n");
-    scanf("%s", contatos[*numContatos].nome); 
+    fgets(contatos[*numContatos].nome, M_Nome, stdin);
+    contatos[*numContatos].nome[strcspn(contatos[*numContatos].nome, "\n")] = 0;  // Remove o \n do nome
+
     printf("Digite o número de telefone. Exemplo: 63 99999-9999\n");
-    scanf("%s", contatos[*numContatos].telefone); 
+    fgets(contatos[*numContatos].telefone, M_Telefone, stdin);
+    contatos[*numContatos].telefone[strcspn(contatos[*numContatos].telefone, "\n")] = 0; // Remove o \n do telefone
 
     (*numContatos)++;
     printf("Contato adicionado com sucesso\n");
@@ -100,7 +98,7 @@ void novo_contato(contato contatos[], int *numContatos) {
 void buscar_contato(contato contatos[], int numContatos) {
     char nomeBusca[M_Nome];
     printf("Digite o nome do contato a buscar: ");
-    fgets(nomeBusca, M_Nome, stdin); // Simula a entrada do cliente
+    fgets(nomeBusca, M_Nome, stdin); // Lê a busca incluindo espaços
     nomeBusca[strcspn(nomeBusca, "\n")] = '\0'; // Localiza a primeira ocorrência de um caractere
 
     int encontrado = 0;
@@ -124,7 +122,7 @@ void deletar_contato(contato contatos[], int *numContatos) {
 
     char nomeBusca[M_Nome];
     printf("Digite o nome do contato a deletar: ");
-    fgets(nomeBusca, M_Nome, stdin); // Simula a entrada do cliente
+    fgets(nomeBusca, M_Nome, stdin); // Lê a busca incluindo espaços
     nomeBusca[strcspn(nomeBusca, "\n")] = '\0'; // Remove o '\n' no final
 
     int i, encontrado = 0;
@@ -140,7 +138,7 @@ void deletar_contato(contato contatos[], int *numContatos) {
         for (int j = i; j < *numContatos - 1; j++) {
             contatos[j] = contatos[j + 1];
         }
-        (*numContatos)--;
+        (*numContatos)--; 
         printf("Contato deletado com sucesso.\n");
     } else {
         printf("Contato não encontrado.\n");
