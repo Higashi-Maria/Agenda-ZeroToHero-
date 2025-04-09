@@ -17,7 +17,7 @@ typedef struct {
 
 // Vetor da struct agenda[50]
 contato agenda[MAX_Contatos];
-int totalcontatos = 0;
+int numContatos = 0;
 
 // Definindo as funções e os parâmetros que serão passados
 void carregar_agenda(contato contatos[]);
