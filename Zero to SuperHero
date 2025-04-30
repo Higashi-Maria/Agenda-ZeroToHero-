@@ -5,17 +5,18 @@
 #define MAX_Contatos 50
 #define M_Nome 128
 #define M_Telefone 15
-#define Arquivo_Csv; "agenda0H.csv"
+#define Arquivo_Csv "agenda0H.csv"
 
 typedef struct {
     char nome[M_Nome];
     char telefone[M_Telefone];
 } contato;
-    
-typedef struct no TNo;
-    struct contato info;
+
+typedef struct no {
+    contato info;
     struct no* prox;
-    
+} TNo;
+
 
 TNo* novo_contato(TNo* lista);
 void buscar_contato(TNo* lista);
@@ -25,9 +26,9 @@ void salvar_contatos(TNo* lista, const char* arquivo_agenda);
 
 
 void main (){
-    TNo* lista = carregar_contatos(const char* Arquivo_Csv);
+    TNo* lista = carregar_contatos(Arquivo_Csv);
     int registro;
-    
+
     do {
         // Criação do MENU, chamando as funções
         printf("\n\n [MENU] \n\n");
@@ -42,16 +43,16 @@ void main (){
 
         switch(registro) {
             case 1:
-                novo_contato();  
+                novo_contato(lista);  
                 break;
             case 2:
-                buscar_contato();  
+                buscar_contato(lista);  
                 break;
             case 3:
-                deletar_contato();  
+                deletar_contato(lista);  
                 break;
             case 4:
-                salvar_contatos();  
+                salvar_contatos(lista, Arquivo_Csv);  
                 break;
             case 0:
                 break;
@@ -59,15 +60,15 @@ void main (){
 
     } while (registro != 0);
 }
-    
+
 TNo* novo_contato(TNo* lista) {
     TNo* novo = malloc(sizeof(TNo));
     if(!novo) {
         printf("\nERRO\n");
         return lista;
-        
+
     }
-    
+
     printf("Digite o nome\n");
     fgets(novo -> nome, M_Nome, stdin);
     novo -> nome[strcspn(novo -> nome, "\n")] = 0;  // Remove o \n do nome
@@ -75,7 +76,7 @@ TNo* novo_contato(TNo* lista) {
     printf("Digite o número de telefone. Exemplo: 63 99999-9999\n");
     fgets(novo -> telefone, M_Telefone, stdin);
     novo -> telefone[strcspn(novo -> telefone, "\n")] = 0; // Remove o \n do telefone
-    
+
     novo -> prox = lista;
     return novo; //inicio da lista
 
@@ -87,17 +88,17 @@ void buscar_contato(TNo* lista) {
     printf("Digite o nome do contato a buscar: ");
     fgets(nomeBusca, M_Nome, stdin); // Lê a busca incluindo espaços
     nomeBusca[strcspn(nomeBusca, "\n")] = '\0';
-    
+
     TNo* atual = lista;
     int identificado = 0;
-    
+
     while(atual) {
-        if(strstr(atual -> nome, nomeBusca)) {
+        if(strstr(atual -> nome, nomeBusca)==0) {
             printf(">> %s - %s\n, atual -> nome, atual -> telefone");
             identificado = 1;
         }
         atual = atual -> prox;
-        
+
     }
     if(identificado != 1)
         printf("Contato não identificado\n");
@@ -109,66 +110,77 @@ TNo* deletar_contato(TNo* lista) {
     printf("Digite o nome do contato a buscar: ");
     fgets(nomeBusca, M_Nome, stdin); // Lê a busca incluindo espaços
     nomeBusca[strcspn(nomeBusca, "\n")] = '\0';
-    
+
     TNo* atual = lista;
     TNo* antecedente = NULL;
-    
+
     while(atual) {
-        if(strcmp(atual -> nome, nome) == 0) {
+        if(strcmp(atual -> nome, no) == 0) {
             if(antecedente)
-                antecedente - > prox = atual -> prox;
+                antecedente -> prox = atual -> prox;
             else
                 lista = atual -> prox;
-                
+
             free(atual);
-            printf("Contato removido com sucesso")        
+            printf("Contato removido com sucesso");      
             return lista;
         }   
-    
+
         antecedente = atual;
         atual = atual -> prox;
     }
     printf("Contato não identificado\n");
     return lista;
-    
+
 }
 
-    
-void carregar_agenda(contato contatos[]) {
-    FILE *arquivo = fopen(Arquivo_Csv, "r");
-    if (!arquivo) return;
 
-    TNo* inicio = NULL;
-    char nome[M_Nome], telefone[M_Telefone];
-    
-    while (fscanf(arquivo, "%127[^,], %14[^\n]\n", nome, telefone) == 2) {
-        TNo* novo = malloc(sizeof(TNo));
-        if (!novo) break;
-        
-        strcpy(novo -> nome, nome);
-        strcpy(novo -> telefoen, telefone);
-        novo -> prox = inicio;
-        inicio = novo
+void carregar_agenda(const char* arquivo_csv) {
+    FILE* file = fopen(arquivo_csv, "r");
+    if (!file) {
+        printf("Arquivo não encontrado. Iniciando lista vazia.\n");
+        return NULL;
     }
 
-    fclose(arquivo);
-    return inicio;
-}
-    
+    TNo* lista = NULL;
+    char linha[200];
 
-void salvar_contatos(TNo* lista, const cha* arquivo_agenda) {
+    while (fgets(linha, sizeof(linha), file)) {
+    TNo* novo = malloc(sizeof(TNo));
+    if (!novo) break;
+
+    linha[strcspn(linha, "\n")] = 0;
+    char* token = strtok(linha, ",");
+    if (token) strncpy(novo->info.nome, token, M_Nome);
+
+    token = strtok(NULL, ",");
+    if (token) strncpy(novo->info.telefone, token, M_Telefone);
+
+    novo->prox = lista;
+    lista = novo;
+}
+
+fclose(file);
+return lista;
+}
+
+void salvar_contatos(TNo* lista, const char* arquivo_agenda) {
     FILE *arquivo = fopen(arquivo_agenda, "w");
     if (arquivo == NULL) {
         printf("Erro ao salvar o arquivo.\n");
         return;
     }
-    
+
     TNo* atual = lista;
-    while(atual) {
+    while(atual != NULL) {
         fprintf(arquivo, "%s, %s\n", atual -> nome, atual -> telefone);
         atual = atual -> prox;
-        
+
     }
     fclose(arquivo);
 }
-    
+
+
+
+
+
